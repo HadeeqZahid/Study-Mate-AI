@@ -1,0 +1,289 @@
+{% extends "base.html" %}
+{% block title %}Login - StudyMate AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        padding: 20px;
+    }
+   
+    /* Animated background circles */
+    .auth-container::before {
+        content: '';
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(circle, rgba(29, 185, 84, 0.15) 0%, transparent 70%);
+        top: -300px;
+        right: -300px;
+        animation: float 20s ease-in-out infinite;
+        border-radius: 50%;
+    }
+   
+    .auth-container::after {
+        content: '';
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(circle, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+        bottom: -250px;
+        left: -250px;
+        animation: float 15s ease-in-out infinite reverse;
+        border-radius: 50%;
+    }
+   
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) scale(1); }
+        50% { transform: translateY(-30px) scale(1.1); }
+    }
+   
+    .auth-card {
+        background: var(--bg-secondary);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--border-primary);
+        border-radius: 20px;
+        padding: 48px;
+        width: 100%;
+        max-width: 450px;
+        box-shadow: var(--shadow-xl);
+        position: relative;
+        z-index: 1;
+    }
+   
+    .logo {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+   
+    .logo i {
+        font-size: 3rem;
+        color: var(--primary);
+        margin-bottom: 16px;
+        display: block;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+   
+    .logo h1 {
+        font-size: 2rem;
+        color: var(--text-primary);
+        margin-bottom: 8px;
+        font-weight: 700;
+    }
+   
+    .logo p {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+   
+    .form-group {
+        margin-bottom: 24px;
+    }
+   
+    label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+   
+    input {
+        width: 100%;
+        padding: 14px 18px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-primary);
+        border-radius: 10px;
+        color: var(--text-primary);
+        font-size: 1rem;
+        transition: all 0.2s ease;
+    }
+
+    input::placeholder {
+        color: var(--text-tertiary);
+    }
+   
+    input:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--bg-tertiary);
+        box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+    }
+   
+    .btn {
+        width: 100%;
+        padding: 16px;
+        background: var(--primary);
+        border: none;
+        border-radius: 10px;
+        color: var(--bg-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+   
+    .btn:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg), var(--glow-primary);
+    }
+
+    .btn:active {
+        transform: translateY(0);
+    }
+   
+    .link-text {
+        text-align: center;
+        margin-top: 28px;
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+    }
+   
+    .link-text a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s ease;
+    }
+   
+    .link-text a:hover {
+        color: var(--primary-hover);
+        text-decoration: underline;
+    }
+
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 24px 0;
+        color: var(--text-tertiary);
+        font-size: 0.85rem;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid var(--border-primary);
+    }
+
+    .divider span {
+        padding: 0 16px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .auth-card {
+            padding: 40px 28px;
+            max-width: 100%;
+        }
+
+        .logo h1 {
+            font-size: 1.75rem;
+        }
+
+        .logo i {
+            font-size: 2.5rem;
+        }
+
+        .logo p {
+            font-size: 0.9rem;
+        }
+
+        input {
+            padding: 12px 16px;
+            font-size: 0.95rem;
+        }
+
+        .btn {
+            padding: 14px;
+            font-size: 0.95rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .auth-container {
+            padding: 15px;
+        }
+
+        .auth-card {
+            padding: 32px 24px;
+            border-radius: 16px;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+        }
+
+        .logo p {
+            font-size: 0.85rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        input {
+            padding: 12px 14px;
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            padding: 12px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="logo">
+            <i class="bi bi-stars"></i>
+            <h1>StudyMate AI</h1>
+            <p>Your AI-Powered Study Companion</p>
+        </div>
+       
+        <form method="POST">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="you@example.com" autocomplete="email">
+            </div>
+           
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required placeholder="Enter your password" autocomplete="current-password">
+            </div>
+           
+            <button type="submit" class="btn">
+                <i class="bi bi-box-arrow-in-right"></i> Login
+            </button>
+        </form>
+       
+        <p class="link-text">
+            Don't have an account? <a href="{{ url_for('main.register') }}">Register here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

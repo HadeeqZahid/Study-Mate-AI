@@ -1,0 +1,464 @@
+{% extends "base.html" %}
+{% block title %}Quiz Results - StudyMate AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .navbar {
+        background: var(--bg-secondary);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-primary);
+        padding: 15px 0;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .back-btn {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .back-btn:hover {
+        color: var(--primary-hover);
+        transform: translateX(-4px);
+    }
+    
+    .results-container {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 0 20px;
+    }
+    
+    .score-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-primary);
+        border-radius: 20px;
+        padding: 50px;
+        text-align: center;
+        margin-bottom: 40px;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .score-circle {
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        margin: 0 auto 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        font-weight: 700;
+        position: relative;
+        color: var(--bg-primary);
+    }
+    
+    .score-excellent {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        box-shadow: var(--glow-primary);
+    }
+    
+    .score-good {
+        background: linear-gradient(135deg, var(--secondary) 0%, #0099cc 100%);
+        box-shadow: var(--glow-secondary);
+    }
+    
+    .score-fair {
+        background: linear-gradient(135deg, var(--warning) 0%, var(--accent) 100%);
+        box-shadow: var(--glow-accent);
+    }
+    
+    .score-poor {
+        background: linear-gradient(135deg, var(--danger) 0%, #c62828 100%);
+        box-shadow: 0 0 20px rgba(244, 67, 54, 0.4);
+    }
+    
+    .score-title {
+        font-size: 2rem;
+        margin-bottom: 15px;
+        color: var(--text-primary);
+    }
+    
+    .score-details {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+        margin-bottom: 10px;
+    }
+    
+    .score-date {
+        color: var(--text-tertiary);
+        font-size: 0.9rem;
+    }
+    
+    .message {
+        padding: 20px 24px;
+        border-radius: 12px;
+        margin-bottom: 40px;
+        font-size: 1.1rem;
+        border: 1px solid;
+    }
+    
+    .message-excellent {
+        background: rgba(29, 185, 84, 0.15);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+    
+    .message-good {
+        background: rgba(0, 212, 255, 0.15);
+        border-color: var(--secondary);
+        color: var(--secondary);
+    }
+    
+    .message-fair {
+        background: rgba(255, 167, 38, 0.15);
+        border-color: var(--warning);
+        color: var(--warning);
+    }
+    
+    .message-poor {
+        background: rgba(244, 67, 54, 0.15);
+        border-color: var(--danger);
+        color: var(--danger);
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .question-review {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-primary);
+        border-radius: 12px;
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .question-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+    }
+    
+    .question-num {
+        font-weight: 600;
+        color: var(--text-secondary);
+    }
+    
+    .badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .badge-correct {
+        background: rgba(29, 185, 84, 0.15);
+        color: var(--primary);
+        border: 1px solid var(--primary);
+    }
+    
+    .badge-incorrect {
+        background: rgba(244, 67, 54, 0.15);
+        color: var(--danger);
+        border: 1px solid var(--danger);
+    }
+    
+    .question-text {
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+        line-height: 1.6;
+        color: var(--text-primary);
+    }
+    
+    .answer-option {
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-primary);
+        position: relative;
+    }
+    
+    .answer-correct {
+        background: rgba(29, 185, 84, 0.1);
+        border-color: var(--primary);
+        color: var(--text-primary);
+    }
+    
+    .answer-incorrect {
+        background: rgba(244, 67, 54, 0.1);
+        border-color: var(--danger);
+        color: var(--text-primary);
+    }
+
+    .answer-option i {
+        position: absolute;
+        right: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    
+    .actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+    
+    .btn {
+        padding: 14px 28px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        font-size: 1rem;
+    }
+    
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .btn-primary {
+        background: var(--primary);
+        color: var(--bg-primary);
+        border: none;
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-primary:hover {
+        background: var(--primary-hover);
+        box-shadow: var(--shadow-lg), var(--glow-primary);
+    }
+    
+    .btn-secondary {
+        background: transparent;
+        border: 1px solid var(--border-primary);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--bg-elevated);
+        border-color: var(--text-secondary);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .results-container {
+            padding: 0 15px;
+        }
+
+        .score-card {
+            padding: 40px 24px;
+        }
+
+        .score-circle {
+            width: 160px;
+            height: 160px;
+            font-size: 3rem;
+        }
+
+        .score-title {
+            font-size: 1.5rem;
+        }
+
+        .score-details {
+            font-size: 1rem;
+        }
+
+        .message {
+            padding: 16px 20px;
+            font-size: 1rem;
+        }
+
+        .question-review {
+            padding: 20px;
+        }
+
+        .question-text {
+            font-size: 1rem;
+        }
+
+        .answer-option {
+            padding: 10px 14px;
+            font-size: 0.95rem;
+        }
+
+        .actions {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .score-card {
+            padding: 32px 20px;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            font-size: 2.5rem;
+        }
+
+        .score-title {
+            font-size: 1.3rem;
+        }
+
+        .question-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .question-review {
+            padding: 16px;
+        }
+
+        .answer-option {
+            padding-right: 40px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-content">
+            <a href="{{ url_for('main.view_notebook', notebook_id=quiz.notebook_id) }}" class="back-btn">
+                <i class="bi bi-arrow-left"></i> Back to Notebook
+            </a>
+        </div>
+    </div>
+</nav>
+
+<div class="results-container">
+    <div class="score-card">
+        <div class="score-circle {% if attempt.percentage >= 80 %}score-excellent{% elif attempt.percentage >= 60 %}score-good{% elif attempt.percentage >= 40 %}score-fair{% else %}score-poor{% endif %}">
+            {{ attempt.percentage|round|int }}%
+        </div>
+        <h2 class="score-title">
+            {% if attempt.percentage >= 80 %}
+                🎉 Excellent Work!
+            {% elif attempt.percentage >= 60 %}
+                👍 Good Job!
+            {% elif attempt.percentage >= 40 %}
+                📚 Keep Practicing
+            {% else %}
+                💪 Need More Study
+            {% endif %}
+        </h2>
+        <p class="score-details">
+            You scored <strong>{{ attempt.score }}</strong> out of <strong>{{ attempt.total_questions }}</strong> questions
+        </p>
+        <p class="score-date">
+            <i class="bi bi-calendar"></i> {{ attempt.attempted_at.strftime('%B %d, %Y at %I:%M %p') }}
+        </p>
+    </div>
+    
+    <div class="message {% if attempt.percentage >= 80 %}message-excellent{% elif attempt.percentage >= 60 %}message-good{% elif attempt.percentage >= 40 %}message-fair{% else %}message-poor{% endif %}">
+        <i class="bi bi-{% if attempt.percentage >= 80 %}trophy-fill{% elif attempt.percentage >= 60 %}check-circle-fill{% elif attempt.percentage >= 40 %}info-circle-fill{% else %}exclamation-triangle-fill{% endif %}"></i>
+        {% if attempt.percentage >= 80 %}
+            Outstanding! You have a strong grasp of this material. Keep up the excellent work!
+        {% elif attempt.percentage >= 60 %}
+            You're doing well! Review the questions you missed to solidify your understanding.
+        {% elif attempt.percentage >= 40 %}
+            You're on the right track. Spend more time reviewing the material and try again.
+        {% else %}
+            This topic needs more attention. Review your study materials and practice more before the next attempt.
+        {% endif %}
+    </div>
+    
+    <h3 class="section-title"><i class="bi bi-list-check"></i> Question Review</h3>
+    
+    {% for question in questions %}
+    {% set user_answer_obj = question.answers|selectattr('attempt_id', 'equalto', attempt.id)|first %}
+    {% set user_answer = user_answer_obj.selected_answer if user_answer_obj else '' %}
+    {% set is_correct = user_answer_obj.is_correct if user_answer_obj else false %}
+    <div class="question-review">
+        <div class="question-header">
+            <span class="question-num">Question {{ loop.index }}</span>
+            <span class="badge {% if is_correct %}badge-correct{% else %}badge-incorrect{% endif %}">
+                <i class="bi bi-{% if is_correct %}check-circle-fill{% else %}x-circle-fill{% endif %}"></i>
+                {% if is_correct %}Correct{% else %}Incorrect{% endif %}
+            </span>
+        </div>
+        
+        <p class="question-text">{{ question.question_text }}</p>
+        
+        <div class="answer-option {% if 'A' == question.correct_answer %}answer-correct{% elif user_answer == 'A' and not is_correct %}answer-incorrect{% endif %}">
+            <strong>A)</strong> {{ question.option_a }}
+            {% if 'A' == question.correct_answer %}
+                <i class="bi bi-check-circle-fill" style="color: var(--primary);"></i>
+            {% elif user_answer == 'A' and not is_correct %}
+                <i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>
+            {% endif %}
+        </div>
+        
+        <div class="answer-option {% if 'B' == question.correct_answer %}answer-correct{% elif user_answer == 'B' and not is_correct %}answer-incorrect{% endif %}">
+            <strong>B)</strong> {{ question.option_b }}
+            {% if 'B' == question.correct_answer %}
+                <i class="bi bi-check-circle-fill" style="color: var(--primary);"></i>
+            {% elif user_answer == 'B' and not is_correct %}
+                <i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>
+            {% endif %}
+        </div>
+        
+        <div class="answer-option {% if 'C' == question.correct_answer %}answer-correct{% elif user_answer == 'C' and not is_correct %}answer-incorrect{% endif %}">
+            <strong>C)</strong> {{ question.option_c }}
+            {% if 'C' == question.correct_answer %}
+                <i class="bi bi-check-circle-fill" style="color: var(--primary);"></i>
+            {% elif user_answer == 'C' and not is_correct %}
+                <i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>
+            {% endif %}
+        </div>
+        
+        <div class="answer-option {% if 'D' == question.correct_answer %}answer-correct{% elif user_answer == 'D' and not is_correct %}answer-incorrect{% endif %}">
+            <strong>D)</strong> {{ question.option_d }}
+            {% if 'D' == question.correct_answer %}
+                <i class="bi bi-check-circle-fill" style="color: var(--primary);"></i>
+            {% elif user_answer == 'D' and not is_correct %}
+                <i class="bi bi-x-circle-fill" style="color: var(--danger);"></i>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    
+    <div class="actions">
+        <a href="{{ url_for('main.view_notebook', notebook_id=quiz.notebook_id) }}" class="btn btn-primary">
+            <i class="bi bi-house-fill"></i> Back to Notebook
+        </a>
+        <a href="{{ url_for('main.take_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-clockwise"></i> Retake Quiz
+        </a>
+    </div>
+</div>
+{% endblock %}

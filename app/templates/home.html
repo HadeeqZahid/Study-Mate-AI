@@ -1,0 +1,623 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - StudyMate AI{% endblock %}
+
+{% block extra_css %}
+<style>
+    .navbar {
+        background: var(--bg-secondary);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-primary);
+        padding: 16px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: var(--shadow-md);
+    }
+   
+    .nav-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+   
+    .logo-text {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        white-space: nowrap;
+    }
+
+    .logo-text i {
+        color: var(--primary);
+        font-size: 1.8rem;
+    }
+   
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .btn-performance {
+        padding: 10px 18px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-primary);
+        border-radius: 8px;
+        color: var(--primary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-performance:hover {
+        background: var(--primary);
+        color: var(--bg-primary);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md), var(--glow-primary);
+    }
+   
+    .user-name {
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.95rem;
+    }
+   
+    .btn-logout {
+        padding: 10px 18px;
+        background: transparent;
+        border: 1px solid var(--border-primary);
+        border-radius: 8px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-weight: 500;
+        font-size: 0.9rem;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+   
+    .btn-logout:hover {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md), 0 0 20px rgba(244, 67, 54, 0.4);
+    }
+   
+    .main-content {
+        padding: 40px 0 60px;
+    }
+   
+    .header {
+        margin-bottom: 40px;
+        text-align: center;
+    }
+   
+    .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+        font-weight: 800;
+    }
+
+    .header h1 .wave {
+        display: inline-block;
+        animation: wave 2s ease-in-out infinite;
+    }
+
+    @keyframes wave {
+        0%, 100% { transform: rotate(0deg); }
+        10%, 30% { transform: rotate(14deg); }
+        20% { transform: rotate(-8deg); }
+        40% { transform: rotate(0deg); }
+    }
+   
+    .header p {
+        color: var(--text-secondary);
+        font-size: 1.1rem;
+    }
+   
+    .create-notebook {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-primary);
+        border-radius: 16px;
+        padding: 32px;
+        margin-bottom: 40px;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .create-notebook:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-lg), var(--glow-primary);
+    }
+   
+    .create-notebook h3 {
+        margin-bottom: 24px;
+        color: var(--primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.3rem;
+        font-weight: 600;
+    }
+   
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+   
+    .form-group {
+        flex: 1;
+    }
+   
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        font-weight: 500;
+    }
+   
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 16px;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-primary);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 0.95rem;
+        transition: all 0.2s ease;
+    }
+   
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: var(--bg-tertiary);
+        box-shadow: 0 0 0 3px rgba(29, 185, 84, 0.1);
+    }
+   
+    .btn-create {
+        padding: 14px 28px;
+        background: var(--primary);
+        border: none;
+        border-radius: 8px;
+        color: var(--bg-primary);
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 1rem;
+        box-shadow: var(--shadow-md);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        justify-content: center;
+    }
+   
+    .btn-create:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg), var(--glow-primary);
+    }
+
+    .btn-create:active {
+        transform: translateY(0);
+    }
+   
+    .notebooks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 24px;
+    }
+   
+    .notebook-card {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-primary);
+        border-radius: 16px;
+        padding: 28px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+        backdrop-filter: blur(10px);
+        position: relative;
+        overflow: hidden;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .notebook-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(29, 185, 84, 0.1), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .notebook-card:hover::before {
+        left: 100%;
+    }
+   
+    .notebook-card:hover {
+        transform: translateY(-4px);
+        border-color: var(--primary);
+        box-shadow: var(--shadow-lg), var(--glow-primary);
+    }
+   
+    .notebook-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 16px;
+        position: relative;
+        z-index: 1;
+    }
+   
+    .notebook-title {
+        font-size: 1.35rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .notebook-title i {
+        color: var(--primary);
+    }
+   
+    .notebook-desc {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        margin-bottom: 20px;
+        line-height: 1.5;
+        position: relative;
+        z-index: 1;
+    }
+   
+    .notebook-stats {
+        display: flex;
+        gap: 12px;
+        font-size: 0.9rem;
+        color: var(--text-tertiary);
+        flex-wrap: wrap;
+        position: relative;
+        z-index: 1;
+    }
+   
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        background: var(--bg-elevated);
+        border-radius: 6px;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .notebook-card:hover .stat {
+        background: rgba(29, 185, 84, 0.1);
+        color: var(--primary);
+    }
+   
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        color: var(--text-secondary);
+    }
+   
+    .empty-state i {
+        font-size: 5rem;
+        margin-bottom: 24px;
+        opacity: 0.3;
+        color: var(--primary);
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        margin-bottom: 12px;
+        color: var(--text-primary);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .nav-content {
+            gap: 8px;
+        }
+
+        .logo-text {
+            font-size: 1.2rem;
+        }
+
+        .logo-text i {
+            font-size: 1.4rem;
+        }
+
+        .user-info {
+            width: 100%;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .user-name span {
+            display: none;
+        }
+
+        .user-name {
+            font-size: 0.85rem;
+        }
+
+        .btn-performance,
+        .btn-logout {
+            padding: 8px 14px;
+            font-size: 0.85rem;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            font-size: 0.95rem;
+        }
+
+        .create-notebook {
+            padding: 24px 20px;
+        }
+
+        .create-notebook h3 {
+            font-size: 1.1rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .form-group input {
+            padding: 12px 14px;
+            font-size: 0.9rem;
+        }
+
+        .btn-create {
+            padding: 12px 24px;
+            font-size: 0.95rem;
+        }
+
+        .notebooks-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        .notebook-card {
+            padding: 20px;
+        }
+
+        .notebook-title {
+            font-size: 1.15rem;
+        }
+
+        .notebook-stats {
+            gap: 8px;
+        }
+
+        .stat {
+            font-size: 0.8rem;
+            padding: 5px 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .navbar {
+            padding: 12px 0;
+        }
+
+        .logo-text {
+            font-size: 1rem;
+        }
+
+        .logo-text i {
+            font-size: 1.2rem;
+        }
+
+        .user-info {
+            gap: 6px;
+        }
+
+        .btn-performance span,
+        .btn-logout span {
+            display: none;
+        }
+
+        .btn-performance,
+        .btn-logout {
+            padding: 8px 10px;
+        }
+
+        .main-content {
+            padding: 24px 0 40px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+        }
+
+        .create-notebook {
+            padding: 20px 16px;
+        }
+
+        .create-notebook h3 {
+            font-size: 1rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+        }
+
+        .form-group input {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-create {
+            padding: 12px 20px;
+            font-size: 0.9rem;
+        }
+
+        .notebook-card {
+            padding: 16px;
+        }
+
+        .notebook-title {
+            font-size: 1rem;
+        }
+
+        .notebook-desc {
+            font-size: 0.85rem;
+        }
+
+        .stat {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+        }
+
+        .empty-state {
+            padding: 60px 15px;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.2rem;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<nav class="navbar">
+    <div class="container">
+        <div class="nav-content">
+            <div class="logo-text">
+                <i class="bi bi-stars"></i> StudyMate AI
+            </div>
+            <div class="user-info">
+                <a href="{{ url_for('main.performance') }}" class="btn-performance">
+                    <i class="bi bi-graph-up"></i> <span>Performance</span>
+                </a>
+                <span class="user-name">
+                    <i class="bi bi-person-circle"></i>
+                    <span>{{ current_user.name }}</span>
+                </span>
+                <a href="{{ url_for('main.logout') }}" class="btn-logout">
+                    <i class="bi bi-box-arrow-right"></i> <span>Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="main-content">
+    <div class="container">
+        <div class="header">
+            <h1>Welcome back, {{ current_user.name.split()[0] }}! <span class="wave">👋</span></h1>
+            <p>Organize your study materials into notebooks and chat with AI</p>
+        </div>
+       
+        <div class="create-notebook">
+            <h3><i class="bi bi-plus-circle"></i> Create New Notebook</h3>
+            <form method="POST" action="{{ url_for('main.create_notebook') }}">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Notebook Name *</label>
+                        <input type="text" id="name" name="name" required placeholder="e.g., Computer Science">
+                    </div>
+                    <div class="form-group">
+                        <label for="description">Description (optional)</label>
+                        <input type="text" id="description" name="description" placeholder="e.g., CS fundamentals and data structures">
+                    </div>
+                </div>
+                <button type="submit" class="btn-create">
+                    <i class="bi bi-plus-lg"></i> Create Notebook
+                </button>
+            </form>
+        </div>
+       
+        {% if notebooks %}
+        <div class="notebooks-grid">
+            {% for notebook in notebooks %}
+            <a href="{{ url_for('main.view_notebook', notebook_id=notebook.id) }}" class="notebook-card">
+                <div class="notebook-header">
+                    <div>
+                        <div class="notebook-title">
+                            <i class="bi bi-journal-text"></i> {{ notebook.name }}
+                        </div>
+                        {% if notebook.description %}
+                        <div class="notebook-desc">{{ notebook.description }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="notebook-stats">
+                    <div class="stat">
+                        <i class="bi bi-file-text"></i>
+                        {{ notebook.documents|length }} docs
+                    </div>
+                    <div class="stat">
+                        <i class="bi bi-chat"></i>
+                        {{ notebook.chats|length }} chats
+                    </div>
+                    <div class="stat">
+                        <i class="bi bi-question-circle"></i>
+                        {{ notebook.quizzes|length }} quizzes
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-folder-x"></i>
+            <h3>No notebooks yet</h3>
+            <p>Create your first notebook above to get started!</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
